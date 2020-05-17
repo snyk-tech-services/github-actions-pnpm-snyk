@@ -1,0 +1,43 @@
+name: 'Snyk Pnpm Github Actions'
+description: 'Snyk test and PR check Pnpm projects'
+inputs:
+  snykToken:
+    description: 'Snyk token'
+    required: true
+    default: ''
+  snykOrganization:
+    description: 'Snyk organization'
+    required: true
+    default: ''
+  breakBuild:
+    description: 'Boolean flag to break build if new issue(s) - default true'
+    required: false
+    default: true
+  showDepsInfo:
+    description: 'Enable dependency change details'
+    required: false
+    default: false
+  pnpmLockfilePath:
+    description: 'Path to pnpm lock file'
+    required: false
+    default: '.'
+  debug:
+    description: 'Enable debug mode - boolean'
+    required: false
+    default: false
+  snykArguments:
+    description: 'Series of argument you would pass Snyk test'
+    required: false
+    default: ''
+  fullScan:
+    description: 'Enable to break if contains any issues, not just newly introduced issues'
+    required: false
+    default: false
+  branchPattern:
+    description: 'Branch pattern for which this logic should kick in'
+    required: false
+    default: ''
+outputs:
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
