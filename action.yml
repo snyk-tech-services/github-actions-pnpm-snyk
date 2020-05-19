@@ -20,7 +20,7 @@ inputs:
   pnpmLockfilePath:
     description: 'Path to pnpm lock file'
     required: false
-    default: '.'
+    default: './'
   debug:
     description: 'Enable debug mode - boolean'
     required: false
