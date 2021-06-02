@@ -14,13 +14,12 @@ const processPnpmLockfile_1 = require("./compass/processPnpmLockfile");
 const writeNpmPackageLock_1 = require("./compass/writeNpmPackageLock");
 const child_process_1 = require("child_process");
 const fs = __importStar(require("fs"));
-const pathLib = __importStar(require("path"));
 const runAction = async () => {
     const breakBuild = core.getInput('breakBuild') == 'true' ? true : false;
     try {
         const snykToken = core.getInput('snykToken');
         const snykOrganization = core.getInput('snykOrganization');
-        const path = core.getInput('pnpmLockfilePath') == '.' ? pathLib.resolve(__dirname, '..') : core.getInput('pnpmLockfilePath');
+        const path = core.getInput('pnpmLockfilePath') == '.' ? '/' : core.getInput('pnpmLockfilePath');
         const debug = core.getInput('debugMode');
         const showDeps = core.getInput('showDepsInfo');
         const snykArguments = core.getInput('snykArguments');
