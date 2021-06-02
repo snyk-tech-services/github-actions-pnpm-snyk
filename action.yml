@@ -37,7 +37,6 @@ inputs:
     description: 'Branch pattern for which this logic should kick in'
     required: false
     default: ''
-outputs:
 runs:
   using: 'node12'
   main: 'dist/index.js'
