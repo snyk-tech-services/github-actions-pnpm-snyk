@@ -14,7 +14,7 @@ const runAction = async () => {
     try{
         const snykToken: string = core.getInput('snykToken');
         const snykOrganization: string = core.getInput('snykOrganization');
-        const path: string = core.getInput('pnpmLockfilePath') == '.' ? pathLib.resolve(__dirname, '..') : core.getInput('pnpmLockfilePath')
+        const path: string = core.getInput('pnpmLockfilePath') == '.' ? '/' : core.getInput('pnpmLockfilePath')
         
         const debug: boolean = core.getInput('debugMode')
         const showDeps: boolean = core.getInput('showDepsInfo')
