@@ -28,7 +28,7 @@ inputs:
   snykArguments:
     description: 'Series of argument you would pass Snyk test'
     required: false
-    default: ''
+    default: '- d'
   fullScan:
     description: 'Enable to break if contains any issues, not just newly introduced issues'
     required: false

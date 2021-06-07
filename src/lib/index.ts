@@ -6,6 +6,7 @@ import { writeNpmPackageLock  } from './compass/writeNpmPackageLock'
 import { execSync } from 'child_process';
 import * as fs from 'fs'
 import * as pathLib from 'path'
+const log = require('debug')
 
 
 const runAction = async () => {
@@ -30,6 +31,8 @@ const runAction = async () => {
 
 
         const snykAuth = execSync(`npx snyk auth ${snykToken}`)
+
+        log(path)
 
         const packageLock = await processPnpmLockfile(path+"pnpm-lock.yaml");
         

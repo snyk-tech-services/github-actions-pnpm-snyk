@@ -2,6 +2,7 @@ import { ResolvedDependencies, PackageSnapshots } from '@pnpm/lockfile-file'
 import { DEPENDENCIES_FIELDS } from '@pnpm/types'
 import readYamlFile from 'read-yaml-file'
 
+
 interface PnpmPackageLock {
   dependencies?: ResolvedDependencies,
   devDependencies?: ResolvedDependencies,
@@ -184,6 +185,8 @@ function getSubdependencyFromDependency(dep: NpmLockedPackageDependency): NpmLoc
 function processLockfile(lockfile: PnpmPackageLock): NpmPackageLock {
   const deps = {} as NpmLockedPackageDependencyMap;
   const subdeps = {} as NpmLockedPackageDependencyMap;
+
+  console.log('processing lock pnpm file')
 
   // establish precedence of direct dependencies that would exist in node_modules root
   for (const deptype of DEPENDENCIES_FIELDS) {

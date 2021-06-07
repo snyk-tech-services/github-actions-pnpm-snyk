@@ -18,8 +18,9 @@ jobs:
       uses: snyk-tech-services/github-actions-pnpm-snyk@master
       with:
         snykToken: ${{ secrets.snykToken }}
-        pnpmLockfilePath: "tests/fixtures/with-tslint/"
+        pnpmLockfilePath: "tests"
         snykOrganization: playground
+        ACTIONS_STEP_DEBUG: true
         # snykArguments: "--severity-threshold=high"
         # breakBuild: false
         # fullScan: false
