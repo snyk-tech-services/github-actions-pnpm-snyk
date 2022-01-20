@@ -5,17 +5,16 @@ import { processPnpmLockfile  } from './compass/processPnpmLockfile'
 import { writeNpmPackageLock  } from './compass/writeNpmPackageLock'
 import { execSync } from 'child_process';
 import * as fs from 'fs'
-import * as pathLib from 'path'
 
 
 const runAction = async () => {
-     
+
     const breakBuild: boolean = core.getInput('breakBuild') == 'true' ? true : false
     try{
         const snykToken: string = core.getInput('snykToken');
         const snykOrganization: string = core.getInput('snykOrganization');
         const path: string = core.getInput('pnpmLockfilePath') == '.' ? '/' : core.getInput('pnpmLockfilePath')
-        
+
         const debug: boolean = core.getInput('debugMode')
         const showDeps: boolean = core.getInput('showDepsInfo')
         const snykArguments: string = core.getInput('snykArguments')
@@ -32,11 +31,11 @@ const runAction = async () => {
         const snykAuth = execSync(`npx snyk auth ${snykToken}`)
 
         const packageLock = await processPnpmLockfile(path+"pnpm-lock.yaml");
-        
-        await writeNpmPackageLock(packageLock, path+"package-lock.json"); 
+
+        await writeNpmPackageLock(packageLock, path+"package-lock.json");
 
         snykArgs = '--org=' + snykOrganization + ' ' + snykArgs
-        
+
 
         if(payload.commits && payload.head_commit) {
             // On push, monitor
@@ -45,7 +44,7 @@ const runAction = async () => {
             console.log(snykTest.toString())
 
         } else if(payload.pull_request){
-            
+
             const snykShowDepsArg: string = showDeps ? '': '--print-deps'
             if(snykArgs.indexOf('--json') < 0 && !fullScan){
                 snykArgs = '--json '+snykArgs
@@ -53,17 +52,17 @@ const runAction = async () => {
             if(snykArgs.indexOf('--print-deps') < 0 && showDeps){
                 snykArgs = snykShowDepsArg + ' ' + snykArgs
             }
-            
+
 
             if(!breakBuild){
                 console.log("================================")
                 console.log("         NON BLOCKING MODE      ")
                 console.log("================================")
             }
-            
 
 
-            
+
+
             if(fullScan) {
                 const cmd = breakBuild ? `npx snyk test ${snykArgs}` : `npx snyk test ${snykArgs} || true`
                 try {
@@ -95,7 +94,7 @@ const runAction = async () => {
                     console.log("          END OF DEBUG          ")
                     console.log("================================")
                 }
-                
+
                 const result = await getDelta(fs.readFileSync(path+'out').toString())
                 switch(result) {
                     case 1:
@@ -126,10 +125,10 @@ const runAction = async () => {
                         }
                         break;
                     default:
-                        
+
                 }
-               
-                
+
+
             }
         } else {
             console.log("Unexpected event type - works on PRs and Push events")
@@ -150,14 +149,14 @@ const checkSnykToken = (snykToken: string) => {
     if(!isStringAgainstRegexOK(snykToken,regex)){
         throw new Error("Unauthorized characters in snyk token")
     }
-    
+
 }
 const checkSnykArgs = (snykArgs: string) => {
     const regex = /[^a-zA-Z0-9\/\-_\\=\.\" ]/
     if(!isStringAgainstRegexOK(snykArgs,regex)) {
         throw new Error("Unauthorized characters in snyk args")
     }
-    
+
 }
 
 const isStringAgainstRegexOK = (stringItem: string, regex: RegExp): boolean => {
@@ -173,7 +172,7 @@ const isStringAgainstRegexOK = (stringItem: string, regex: RegExp): boolean => {
 if(!module.parent){
     runAction()
 }
- 
+
 
 export {
     runAction
