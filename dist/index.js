@@ -87365,11 +87365,10 @@ var PnpmPackageDescType;
     PnpmPackageDescType[PnpmPackageDescType["Github"] = 1] = "Github";
     PnpmPackageDescType[PnpmPackageDescType["Uri"] = 2] = "Uri";
 })(PnpmPackageDescType || (PnpmPackageDescType = {}));
-;
 async function processPnpmLockfile(lockfilePath) {
     const lockfile = await readPnpmLockfile(lockfilePath);
     if (lockfile == null) {
-        throw new Error('Failed to load pnpm lock file ' + lockfilePath);
+        throw new Error("Failed to load pnpm lock file " + lockfilePath);
     }
     return processLockfile(lockfile);
 }
@@ -87379,20 +87378,25 @@ async function readPnpmLockfile(lockfilePath) {
         return await read_yaml_file_1.default(lockfilePath);
     }
     catch (err) {
-        if (err.code !== 'ENOENT') {
+        if (err.code !== "ENOENT") {
             throw err;
         }
         return null;
     }
 }
 function getGithubPackageDesc(uri) {
-    const result = /^github\.com\/([^\/]+\/([^\/]+))\/([0-9a-f]{40}).*$/.exec(uri);
+    const result = /^github\.com\/([^/]+\/([^/]+))\/([0-9a-f]{40}).*$/.exec(uri);
     if (result == null) {
         throw new Error("Error parsing github URI " + uri);
     }
-    const versionUri = 'github:' + result[1] + '#' + result[3];
+    const versionUri = "github:" + result[1] + "#" + result[3];
     const name = result[2];
-    return { type: PnpmPackageDescType.Github, fullname: uri, name, version: versionUri };
+    return {
+        type: PnpmPackageDescType.Github,
+        fullname: uri,
+        name,
+        version: versionUri,
+    };
 }
 // Package names look like:
 //   /@pnpm/error/1.0.0
@@ -87404,13 +87408,13 @@ function getGithubPackageDesc(uri) {
 //   github.com/LewisArdern/eslint-plugin-angularjs-security-rules/41da01727c87119bd523e69e22af2d04ab558ec9
 //   github.com/Vydia/eslint-plugin-babel/0a1f35536c8182892459f192284f022cdee95561_eslint@7.19.0
 function getPathPackageDesc(fullname) {
-    if (!fullname.startsWith('github.com/')) {
-        const result = /^[^\/]*\/((?:@[^\/]+\/)?[^\/]+)\/(.*)$/.exec(fullname);
+    if (!fullname.startsWith("github.com/")) {
+        const result = /^[^/]*\/((?:@[^/]+\/)?[^/]+)\/(.*)$/.exec(fullname);
         if (result == null) {
             throw new Error("Error parsing package name " + fullname);
         }
         let type;
-        if (fullname[0] === '/') {
+        if (fullname[0] === "/") {
             type = PnpmPackageDescType.Version;
         }
         else {
@@ -87420,7 +87424,7 @@ function getPathPackageDesc(fullname) {
         const version = result[2];
         let versionNumber;
         let extra;
-        const firstUnderscore = version.indexOf('_');
+        const firstUnderscore = version.indexOf("_");
         if (firstUnderscore != -1) {
             versionNumber = version.substr(0, firstUnderscore);
             extra = version.substr(firstUnderscore + 1);
@@ -87437,7 +87441,7 @@ function getPathPackageDesc(fullname) {
 // A package in the 'dependencies' section of the lockfile
 function getDependencyPackageDesc(name, version) {
     if (/^\d/.test(version)) {
-        return getPathPackageDesc(['', name, version].join('/'));
+        return getPathPackageDesc(["", name, version].join("/"));
     }
     else {
         return getPathPackageDesc(version);
@@ -87446,16 +87450,16 @@ function getDependencyPackageDesc(name, version) {
 function getPackage(lockfile, packageDesc, remove) {
     const snapshot = (lockfile.packages || {})[packageDesc.fullname];
     if (snapshot === undefined) {
-        throw new Error('Failed to lookup ' + packageDesc.fullname + ' in packages');
+        throw new Error("Failed to lookup " + packageDesc.fullname + " in packages");
     }
-    let dep;
-    dep = { version: packageDesc.version };
-    if (packageDesc.type === PnpmPackageDescType.Github && snapshot.name !== undefined) {
+    const dep = { version: packageDesc.version };
+    if (packageDesc.type === PnpmPackageDescType.Github &&
+        snapshot.name !== undefined) {
         if (lockfile.specifiers[snapshot.name] !== undefined) {
             dep.from = lockfile.specifiers[snapshot.name];
         }
     }
-    if ('integrity' in snapshot.resolution) {
+    if ("integrity" in snapshot.resolution) {
         dep.integrity = snapshot.resolution.integrity;
     }
     if (snapshot.dependencies !== undefined) {
@@ -87484,7 +87488,7 @@ function processLockfile(lockfile) {
     const subdeps = {};
     // establish precedence of direct dependencies that would exist in node_modules root
     for (const deptype of types_1.DEPENDENCIES_FIELDS) {
-        let depsMap = lockfile[deptype];
+        const depsMap = lockfile[deptype];
         if (depsMap !== undefined) {
             for (const [name, version] of Object.entries(depsMap)) {
                 const packageDesc = getDependencyPackageDesc(name, version);
@@ -87506,7 +87510,7 @@ function processLockfile(lockfile) {
     // add required subdependencies from the 'requires' of dependencies
     for (const [key, val] of Object.entries(deps)) {
         if (val.requires !== undefined) {
-            for (let [name, version] of Object.entries(val.requires)) {
+            for (const [name, version] of Object.entries(val.requires)) {
                 const packageDesc = getDependencyPackageDesc(name, version);
                 // secondary dependencies are declared in the 'dependencies' of a package
                 if (packageDesc.fullname in subdeps) {
@@ -87519,11 +87523,15 @@ function processLockfile(lockfile) {
                 else {
                     const dep = deps[name];
                     if (dep.version != packageDesc.version) {
-                        throw new Error('Failed to lookup ' + packageDesc.fullname + ' in dependencies; used by ' + key);
+                        throw new Error("Failed to lookup " +
+                            packageDesc.fullname +
+                            " in dependencies; used by " +
+                            key);
                     }
                 }
                 // remove any extraneous info from the name in 'requires'
-                if (packageDesc.extra !== undefined || packageDesc.type == PnpmPackageDescType.Uri) {
+                if (packageDesc.extra !== undefined ||
+                    packageDesc.type == PnpmPackageDescType.Uri) {
                     val.requires[name] = packageDesc.version;
                 }
             }
@@ -87545,9 +87553,11 @@ exports.writeNpmPackageLock = void 0;
 const writeFileAtomic = __nccwpck_require__(2221);
 async function writeNpmPackageLock(packageLock, filename) {
     const json = JSON.stringify(packageLock, null, 4);
-    await writeFileAtomic(filename, json, (err) => { if (err) {
-        throw err;
-    } });
+    await writeFileAtomic(filename, json, (err) => {
+        if (err) {
+            throw err;
+        }
+    });
 }
 exports.writeNpmPackageLock = writeNpmPackageLock;
 
@@ -87581,33 +87591,35 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runAction = void 0;
-const github = __nccwpck_require__(5438);
-const core = __nccwpck_require__(2186);
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+const child_process_1 = __nccwpck_require__(2081);
+const fs = __importStar(__nccwpck_require__(7147));
 const snyk_delta_1 = __nccwpck_require__(4158);
 const processPnpmLockfile_1 = __nccwpck_require__(1415);
 const writeNpmPackageLock_1 = __nccwpck_require__(8757);
-const child_process_1 = __nccwpck_require__(2081);
-const fs = __importStar(__nccwpck_require__(7147));
 const runAction = async () => {
-    const breakBuild = core.getInput('breakBuild') == 'true' ? true : false;
+    const breakBuild = core.getInput("breakBuild") == "true" ? true : false;
     try {
-        const snykToken = core.getInput('snykToken');
-        const snykOrganization = core.getInput('snykOrganization');
-        const path = core.getInput('pnpmLockfilePath') == '.' ? '/' : core.getInput('pnpmLockfilePath');
-        const debug = core.getInput('debugMode');
-        const showDeps = core.getInput('showDepsInfo');
-        const snykArguments = core.getInput('snykArguments');
-        const fullScan = core.getInput('fullScan') == 'true' ? true : false;
+        const snykToken = core.getInput("snykToken");
+        const snykOrganization = core.getInput("snykOrganization");
+        const path = core.getInput("pnpmLockfilePath") == "."
+            ? "/"
+            : core.getInput("pnpmLockfilePath");
+        const debug = core.getInput("debugMode") == "true" ? true : false;
+        const showDeps = core.getInput("showDepsInfo") == "true" ? true : false;
+        const snykArguments = core.getInput("snykArguments");
+        const fullScan = core.getInput("fullScan") == "true" ? true : false;
         const payload = github.context.payload;
         let snykArgs = snykArguments;
         checkSnykToken(snykToken);
-        if (snykArgs != '') {
+        if (snykArgs != "") {
             checkSnykArgs(snykArgs);
         }
         const snykAuth = child_process_1.execSync(`npx snyk auth ${snykToken}`);
         const packageLock = await processPnpmLockfile_1.processPnpmLockfile(path + "pnpm-lock.yaml");
         await writeNpmPackageLock_1.writeNpmPackageLock(packageLock, path + "package-lock.json");
-        snykArgs = '--org=' + snykOrganization + ' ' + snykArgs;
+        snykArgs = "--org=" + snykOrganization + " " + snykArgs;
         if (payload.commits && payload.head_commit) {
             // On push, monitor
             const cmd = `npx snyk monitor ${snykArgs}`;
@@ -87615,12 +87627,12 @@ const runAction = async () => {
             console.log(snykTest.toString());
         }
         else if (payload.pull_request) {
-            const snykShowDepsArg = showDeps ? '' : '--print-deps';
-            if (snykArgs.indexOf('--json') < 0 && !fullScan) {
-                snykArgs = '--json ' + snykArgs;
+            const snykShowDepsArg = showDeps ? "" : "--print-deps";
+            if (snykArgs.indexOf("--json") < 0 && !fullScan) {
+                snykArgs = "--json " + snykArgs;
             }
-            if (snykArgs.indexOf('--print-deps') < 0 && showDeps) {
-                snykArgs = snykShowDepsArg + ' ' + snykArgs;
+            if (snykArgs.indexOf("--print-deps") < 0 && showDeps) {
+                snykArgs = snykShowDepsArg + " " + snykArgs;
             }
             if (!breakBuild) {
                 console.log("================================");
@@ -87628,7 +87640,9 @@ const runAction = async () => {
                 console.log("================================");
             }
             if (fullScan) {
-                const cmd = breakBuild ? `npx snyk test ${snykArgs}` : `npx snyk test ${snykArgs} || true`;
+                const cmd = breakBuild
+                    ? `npx snyk test ${snykArgs}`
+                    : `npx snyk test ${snykArgs} || true`;
                 try {
                     const snykTest = child_process_1.execSync(cmd, { cwd: path });
                     console.log(snykTest.toString());
@@ -87644,13 +87658,15 @@ const runAction = async () => {
                 }
             }
             else {
-                const snykTest = child_process_1.execSync(`npx snyk test ${snykArgs} > out || true`, { cwd: path });
+                const snykTest = child_process_1.execSync(`npx snyk test ${snykArgs} > out || true`, {
+                    cwd: path,
+                });
                 if (debug) {
                     console.log("================================");
                     console.log("              DEBUG             ");
                     console.log("================================");
                     console.log("Converted lock file");
-                    console.log(fs.readFileSync(path + 'package-lock.json').toString());
+                    console.log(fs.readFileSync(path + "package-lock.json").toString());
                     console.log("================================");
                     console.log("DEBUG - Snyk CLI commands");
                     console.log("DEBUG - Snyk auth");
@@ -87661,9 +87677,9 @@ const runAction = async () => {
                     console.log("          END OF DEBUG          ");
                     console.log("================================");
                 }
-                const result = await snyk_delta_1.getDelta(fs.readFileSync(path + 'out').toString());
+                const result = await snyk_delta_1.getDelta(fs.readFileSync(path + "out").toString());
                 switch (result) {
-                    case 1:
+                    case 1: {
                         if (!breakBuild) {
                             process.exit(0);
                         }
@@ -87671,16 +87687,20 @@ const runAction = async () => {
                             core.setFailed("New issue(s) introduced !");
                             process.exit(1);
                         }
-                    case 2:
+                        break;
+                    }
+                    case 2: {
                         console.log("Error during delta computation - defaulting to full scan");
                         // Resets exit code
                         process.exitCode = 0;
-                        let snykArgsNormal = snykArgs.replace('--json ', '');
+                        let snykArgsNormal = snykArgs.replace("--json ", "");
                         if (!breakBuild) {
-                            snykArgsNormal = snykArgsNormal + ' || true';
+                            snykArgsNormal = snykArgsNormal + " || true";
                         }
                         try {
-                            const snykTest = child_process_1.execSync(`npx snyk test ${snykArgsNormal}`, { cwd: path });
+                            const snykTest = child_process_1.execSync(`npx snyk test ${snykArgsNormal}`, {
+                                cwd: path,
+                            });
                             console.log(snykTest.toString());
                         }
                         catch (err) {
@@ -87693,6 +87713,7 @@ const runAction = async () => {
                             }
                         }
                         break;
+                    }
                     default:
                 }
             }
@@ -87713,13 +87734,13 @@ const runAction = async () => {
 };
 exports.runAction = runAction;
 const checkSnykToken = (snykToken) => {
-    const regex = /[^a-f0-9\-]/;
+    const regex = /[^a-f0-9-]/;
     if (!isStringAgainstRegexOK(snykToken, regex)) {
         throw new Error("Unauthorized characters in snyk token");
     }
 };
 const checkSnykArgs = (snykArgs) => {
-    const regex = /[^a-zA-Z0-9\/\-_\\=\.\" ]/;
+    const regex = /[^a-zA-Z0-9/-_\\=." ]/;
     if (!isStringAgainstRegexOK(snykArgs, regex)) {
         throw new Error("Unauthorized characters in snyk args");
     }
