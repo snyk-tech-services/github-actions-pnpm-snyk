@@ -1,6 +1,6 @@
 {
   "name": "github-actions-pnpm-snyk-prevent",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Github action to snyk test and monitor pnpm projects",
   "main": "dist/index.js",
   "scripts": {
