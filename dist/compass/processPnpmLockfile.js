@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.processPnpmLockfile = void 0;
 const types_1 = require("@pnpm/types");
 const read_yaml_file_1 = __importDefault(require("read-yaml-file"));
 var PnpmPackageDescType;
