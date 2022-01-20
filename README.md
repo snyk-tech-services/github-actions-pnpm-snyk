@@ -1,6 +1,7 @@
 # Github Action for scanning pnpm projects with Snyk
 
-Allows for pnpm projects to be scanned in a similar manner as for npm projects on Snyk.
+Allows for pnpm projects to be scanned in a similar manner as for npm projects
+on Snyk.
 
 ## Usage
 
@@ -9,21 +10,21 @@ Steps:
 1. Add your Snyk API token as a GitHub secret, e.g. `snykToken`
 2. Create `.github/workflows/snyk.yaml` with the following content:
 
-  ```yaml
-  name: PNPM-PR-Snyk-Check
+```yaml
+name: PNPM-PR-Snyk-Check
 
-  on: 
-    pull_request:
-      types: [opened,reopened,synchronized]
-    push:
-      branches:
-        - main
-    
-  jobs:
-    pnpm_snyk_check:
-      runs-on: ubuntu-latest
-      name: Snyk post processing
-      steps:
+on:
+  pull_request:
+    types: [opened, reopened, synchronized]
+  push:
+    branches:
+      - main
+
+jobs:
+  pnpm_snyk_check:
+    runs-on: ubuntu-latest
+    name: Snyk post processing
+    steps:
       - uses: actions/checkout@v2
       - name: pnpm Snyk Delta
         id: pnpm-snyk-delta
@@ -35,10 +36,11 @@ Steps:
           # snykArguments: "--severity-threshold=high"
           # breakBuild: "false"
           # fullScan: "false"
-  ```
+```
 
-Once created, any newly opened PR will trigger the workflow.
-After merging it into your repo's main branch, it will monitor the project in the corresponding `snykOrganization`.
+Once created, any newly opened PR will trigger the workflow. After merging it
+into your repo's main branch, it will monitor the project in the corresponding
+`snykOrganization`.
 
 ### Optional Action Inputs to override default values
 
@@ -79,7 +81,8 @@ snykArguments:
   default: ""
 
 fullScan:
-  description: "Enable to break if contains any issues, not just newly introduced issues"
+  description:
+    "Enable to break if contains any issues, not just newly introduced issues"
   required: false
   default: "false"
 

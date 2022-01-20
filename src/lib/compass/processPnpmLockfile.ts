@@ -1,78 +1,80 @@
-import { ResolvedDependencies, PackageSnapshots } from '@pnpm/lockfile-file'
-import { DEPENDENCIES_FIELDS } from '@pnpm/types'
-import readYamlFile from 'read-yaml-file'
+import { PackageSnapshots, ResolvedDependencies } from "@pnpm/lockfile-file";
+import { DEPENDENCIES_FIELDS } from "@pnpm/types";
+import readYamlFile from "read-yaml-file";
 
 interface PnpmPackageLock {
-  dependencies?: ResolvedDependencies,
-  devDependencies?: ResolvedDependencies,
-  optionalDependencies?: ResolvedDependencies,
-  lockfileVersion: number,
-  packages: PackageSnapshots,
-  specifiers: ResolvedDependencies,
+  dependencies?: ResolvedDependencies;
+  devDependencies?: ResolvedDependencies;
+  optionalDependencies?: ResolvedDependencies;
+  lockfileVersion: number;
+  packages: PackageSnapshots;
+  specifiers: ResolvedDependencies;
 }
 
 export interface NpmPackageLock {
-  requires?: boolean,
-  lockfileVersion: number,
-  dependencies: NpmLockedPackageDependencyMap,
+  requires?: boolean;
+  lockfileVersion: number;
+  dependencies: NpmLockedPackageDependencyMap;
 }
 
 export interface NpmLockedPackageDependency {
-  version?: string,
-  resolved?: string,
-  from?: string,
-  integrity?: string,
-  dev?: boolean,
-  requires?: NpmLockedPackageRequiresMap,
-  dependencies?: NpmLockedPackageSubdependencyMap,
+  version?: string;
+  resolved?: string;
+  from?: string;
+  integrity?: string;
+  dev?: boolean;
+  requires?: NpmLockedPackageRequiresMap;
+  dependencies?: NpmLockedPackageSubdependencyMap;
 }
 
 export interface NpmLockedPackageDependencyMap {
-  [name: string]: NpmLockedPackageDependency,
+  [name: string]: NpmLockedPackageDependency;
 }
 
 export interface NpmLockedPackageRequiresMap {
-  [name: string]: string,
+  [name: string]: string;
 }
 
 export interface NpmLockedPackageSubdependency {
-  version: string,
-  resolved?: string,
-  integrity?: string,
+  version: string;
+  resolved?: string;
+  integrity?: string;
 }
 
 export interface NpmLockedPackageSubdependencyMap {
-  [name: string]: NpmLockedPackageSubdependency,
+  [name: string]: NpmLockedPackageSubdependency;
 }
 
 enum PnpmPackageDescType {
   Version,
   Github,
   Uri,
-};
+}
 
 interface PnpmPackageDesc {
-  type: PnpmPackageDescType,
-  fullname: string,
-  name: string,
-  version: string,
-  extra?: string,
+  type: PnpmPackageDescType;
+  fullname: string;
+  name: string;
+  version: string;
+  extra?: string;
 }
 
 export async function processPnpmLockfile(lockfilePath: string) {
   const lockfile = await readPnpmLockfile(lockfilePath);
   if (lockfile == null) {
-    throw new Error('Failed to load pnpm lock file ' + lockfilePath);
+    throw new Error("Failed to load pnpm lock file " + lockfilePath);
   }
 
   return processLockfile(lockfile);
 }
 
-async function readPnpmLockfile(lockfilePath: string): Promise<PnpmPackageLock | null> {
+async function readPnpmLockfile(
+  lockfilePath: string
+): Promise<PnpmPackageLock | null> {
   try {
-    return await readYamlFile<PnpmPackageLock>(lockfilePath)
+    return await readYamlFile<PnpmPackageLock>(lockfilePath);
   } catch (err) {
-    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") {
       throw err;
     }
     return null;
@@ -80,13 +82,18 @@ async function readPnpmLockfile(lockfilePath: string): Promise<PnpmPackageLock |
 }
 
 function getGithubPackageDesc(uri: string): PnpmPackageDesc {
-  const result = /^github\.com\/([^\/]+\/([^\/]+))\/([0-9a-f]{40}).*$/.exec(uri)
+  const result = /^github\.com\/([^/]+\/([^/]+))\/([0-9a-f]{40}).*$/.exec(uri);
   if (result == null) {
     throw new Error("Error parsing github URI " + uri);
   }
-  const versionUri = 'github:' + result[1] + '#' + result[3];
+  const versionUri = "github:" + result[1] + "#" + result[3];
   const name = result[2];
-  return { type: PnpmPackageDescType.Github, fullname: uri, name, version: versionUri };
+  return {
+    type: PnpmPackageDescType.Github,
+    fullname: uri,
+    name,
+    version: versionUri,
+  };
 }
 
 // Package names look like:
@@ -99,14 +106,14 @@ function getGithubPackageDesc(uri: string): PnpmPackageDesc {
 //   github.com/LewisArdern/eslint-plugin-angularjs-security-rules/41da01727c87119bd523e69e22af2d04ab558ec9
 //   github.com/Vydia/eslint-plugin-babel/0a1f35536c8182892459f192284f022cdee95561_eslint@7.19.0
 function getPathPackageDesc(fullname: string): PnpmPackageDesc {
-  if (!fullname.startsWith('github.com/')) {
-    const result = /^[^\/]*\/((?:@[^\/]+\/)?[^\/]+)\/(.*)$/.exec(fullname)
+  if (!fullname.startsWith("github.com/")) {
+    const result = /^[^/]*\/((?:@[^/]+\/)?[^/]+)\/(.*)$/.exec(fullname);
     if (result == null) {
       throw new Error("Error parsing package name " + fullname);
     }
 
     let type;
-    if (fullname[0] === '/') {
+    if (fullname[0] === "/") {
       type = PnpmPackageDescType.Version;
     } else {
       type = PnpmPackageDescType.Uri;
@@ -116,44 +123,55 @@ function getPathPackageDesc(fullname: string): PnpmPackageDesc {
     const version = result[2];
     let versionNumber;
     let extra;
-    const firstUnderscore = version.indexOf('_');
+    const firstUnderscore = version.indexOf("_");
     if (firstUnderscore != -1) {
-      versionNumber = version.substr(0, firstUnderscore)
-      extra = version.substr(firstUnderscore + 1)
+      versionNumber = version.substr(0, firstUnderscore);
+      extra = version.substr(firstUnderscore + 1);
     } else {
       versionNumber = version;
     }
-    return { type, fullname, name, version: versionNumber, extra }
+    return { type, fullname, name, version: versionNumber, extra };
   } else {
     return getGithubPackageDesc(fullname);
   }
 }
 
 // A package in the 'dependencies' section of the lockfile
-function getDependencyPackageDesc(name: string, version: string): PnpmPackageDesc {
+function getDependencyPackageDesc(
+  name: string,
+  version: string
+): PnpmPackageDesc {
   if (/^\d/.test(version)) {
-    return getPathPackageDesc(['', name, version].join('/'));
+    return getPathPackageDesc(["", name, version].join("/"));
   } else {
     return getPathPackageDesc(version);
   }
 }
 
-function getPackage(lockfile: PnpmPackageLock, packageDesc: PnpmPackageDesc, remove: boolean): NpmLockedPackageDependency {
+function getPackage(
+  lockfile: PnpmPackageLock,
+  packageDesc: PnpmPackageDesc,
+  remove: boolean
+): NpmLockedPackageDependency {
   const snapshot = (lockfile.packages || {})[packageDesc.fullname];
   if (snapshot === undefined) {
-    throw new Error('Failed to lookup ' + packageDesc.fullname + ' in packages');
+    throw new Error(
+      "Failed to lookup " + packageDesc.fullname + " in packages"
+    );
   }
 
-  let dep: NpmLockedPackageDependency;
-  dep = { version: packageDesc.version };
+  const dep: NpmLockedPackageDependency = { version: packageDesc.version };
 
-  if (packageDesc.type === PnpmPackageDescType.Github && snapshot.name !== undefined) {
+  if (
+    packageDesc.type === PnpmPackageDescType.Github &&
+    snapshot.name !== undefined
+  ) {
     if (lockfile.specifiers[snapshot.name] !== undefined) {
       dep.from = lockfile.specifiers[snapshot.name];
     }
   }
 
-  if ('integrity' in snapshot.resolution) {
+  if ("integrity" in snapshot.resolution) {
     dep.integrity = snapshot.resolution.integrity;
   }
 
@@ -171,7 +189,9 @@ function getPackage(lockfile: PnpmPackageLock, packageDesc: PnpmPackageDesc, rem
   return dep;
 }
 
-function getSubdependencyFromDependency(dep: NpmLockedPackageDependency): NpmLockedPackageSubdependency {
+function getSubdependencyFromDependency(
+  dep: NpmLockedPackageDependency
+): NpmLockedPackageSubdependency {
   const subdep = { version: dep.version } as NpmLockedPackageSubdependency;
   if (dep.resolved !== undefined) {
     subdep.resolved = dep.resolved;
@@ -188,7 +208,7 @@ function processLockfile(lockfile: PnpmPackageLock): NpmPackageLock {
 
   // establish precedence of direct dependencies that would exist in node_modules root
   for (const deptype of DEPENDENCIES_FIELDS) {
-    let depsMap = lockfile[deptype]
+    const depsMap = lockfile[deptype];
     if (depsMap !== undefined) {
       for (const [name, version] of Object.entries(depsMap)) {
         const packageDesc = getDependencyPackageDesc(name, version);
@@ -211,24 +231,32 @@ function processLockfile(lockfile: PnpmPackageLock): NpmPackageLock {
   // add required subdependencies from the 'requires' of dependencies
   for (const [key, val] of Object.entries(deps)) {
     if (val.requires !== undefined) {
-      for (let [name, version] of Object.entries(val.requires)) {
+      for (const [name, version] of Object.entries(val.requires)) {
         const packageDesc = getDependencyPackageDesc(name, version);
         // secondary dependencies are declared in the 'dependencies' of a package
         if (packageDesc.fullname in subdeps) {
           const dep = subdeps[packageDesc.fullname];
           if (val.dependencies === undefined) {
-            val.dependencies = {}
+            val.dependencies = {};
           }
           val.dependencies[name] = getSubdependencyFromDependency(dep);
         } else {
           const dep = deps[name];
           if (dep.version != packageDesc.version) {
-            throw new Error('Failed to lookup ' + packageDesc.fullname + ' in dependencies; used by ' + key);
+            throw new Error(
+              "Failed to lookup " +
+                packageDesc.fullname +
+                " in dependencies; used by " +
+                key
+            );
           }
         }
 
         // remove any extraneous info from the name in 'requires'
-        if (packageDesc.extra !== undefined || packageDesc.type == PnpmPackageDescType.Uri) {
+        if (
+          packageDesc.extra !== undefined ||
+          packageDesc.type == PnpmPackageDescType.Uri
+        ) {
           val.requires[name] = packageDesc.version;
         }
       }

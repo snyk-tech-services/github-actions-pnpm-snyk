@@ -30,7 +30,8 @@ inputs:
     required: false
     default: ""
   fullScan:
-    description: "Enable to break if contains any issues, not just newly introduced issues"
+    description:
+      "Enable to break if contains any issues, not just newly introduced issues"
     required: false
     default: "false"
   branchPattern:

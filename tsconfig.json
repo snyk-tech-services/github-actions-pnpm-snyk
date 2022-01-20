@@ -1,18 +1,16 @@
 {
-    "compilerOptions": {
-        "target": "esnext",                             /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', or 'ESNEXT'. */
-        // "watch": true,
-        "module": "commonjs",
-        "esModuleInterop": true,
-        "sourceMap": true,
-        "outDir": "dist",
-        "allowSyntheticDefaultImports": true,                     /* Specify module code generation: 'commonjs', 'amd', 'system', 'umd' or 'es2015'. */
-        "lib": ["es2017"]  /* Specify library files to be included in the compilation:  */
-      },
-        "include": [
-          "."
-        ],
-        "exclude": [
-          "tests/*"
-        ]
+  "compilerOptions": {
+    "target": "esnext" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', or 'ESNEXT'. */,
+    // "watch": true,
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "allowSyntheticDefaultImports": true /* Specify module code generation: 'commonjs', 'amd', 'system', 'umd' or 'es2015'. */,
+    "lib": [
+      "es2017"
+    ] /* Specify library files to be included in the compilation:  */
+  },
+  "include": ["."],
+  "exclude": ["tests/*"]
 }
