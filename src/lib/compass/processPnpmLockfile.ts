@@ -64,7 +64,7 @@ export async function processPnpmLockfile(lockfilePath: string) {
   if (lockfile == null) {
     throw new Error('Failed to load pnpm lock file ' + lockfilePath);
   }
-  
+
   return processLockfile(lockfile);
 }
 
@@ -80,7 +80,7 @@ async function readPnpmLockfile(lockfilePath: string): Promise<PnpmPackageLock |
 }
 
 function getGithubPackageDesc(uri: string): PnpmPackageDesc {
-  const result = /^github.com\/([^\/]+\/([^\/]+))\/([0-9a-f]{40})$/.exec(uri)
+  const result = /^github.com\/([^\/]+\/([^\/]+))\/([0-9a-f]{40}).*$/.exec(uri)
   if (result == null) {
     throw new Error("Error parsing github URI " + uri);
   }
@@ -115,7 +115,7 @@ function getPathPackageDesc(fullname: string): PnpmPackageDesc {
     const version = result[2];
     let versionNumber;
     let extra;
-    const firstUnderscore = version.indexOf('_');  
+    const firstUnderscore = version.indexOf('_');
     if (firstUnderscore != -1) {
       versionNumber = version.substr(0, firstUnderscore)
       extra = version.substr(firstUnderscore + 1)
@@ -146,7 +146,7 @@ function getPackage(lockfile: PnpmPackageLock, packageDesc: PnpmPackageDesc, rem
   let dep: NpmLockedPackageDependency;
   dep = { version: packageDesc.version };
 
-  if (packageDesc.type === PnpmPackageDescType.Github && snapshot.name !== undefined) {
+  if (packageDesc.type === PnpmPackageDescType.Github && snapshot.name !== undefined && lockfile.specifiers !== undefined) {
     if (lockfile.specifiers[snapshot.name] !== undefined) {
       dep.from = lockfile.specifiers[snapshot.name];
     }
@@ -189,7 +189,7 @@ function processLockfile(lockfile: PnpmPackageLock): NpmPackageLock {
   for (const deptype of DEPENDENCIES_FIELDS) {
     let depsMap = lockfile[deptype]
     if (depsMap !== undefined) {
-      for (const [name, version] of Object.entries(depsMap)) {  
+      for (const [name, version] of Object.entries(depsMap)) {
         const packageDesc = getDependencyPackageDesc(name, version);
         deps[packageDesc.name] = getPackage(lockfile, packageDesc, true);
       }
@@ -217,7 +217,7 @@ function processLockfile(lockfile: PnpmPackageLock): NpmPackageLock {
           const dep = subdeps[packageDesc.fullname];
           if (val.dependencies === undefined) {
             val.dependencies = {}
-          }    
+          }
           val.dependencies[name] = getSubdependencyFromDependency(dep);
         } else {
           const dep = deps[name];

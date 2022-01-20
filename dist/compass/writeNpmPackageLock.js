@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.writeNpmPackageLock = void 0;
 const writeFileAtomic = require("write-file-atomic");
 async function writeNpmPackageLock(packageLock, filename) {
     const json = JSON.stringify(packageLock, null, 4);

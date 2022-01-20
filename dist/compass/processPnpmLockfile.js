@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.processPnpmLockfile = void 0;
 const types_1 = require("@pnpm/types");
 const read_yaml_file_1 = __importDefault(require("read-yaml-file"));
 var PnpmPackageDescType;
@@ -32,7 +33,7 @@ async function readPnpmLockfile(lockfilePath) {
     }
 }
 function getGithubPackageDesc(uri) {
-    const result = /^github.com\/([^\/]+\/([^\/]+))\/([0-9a-f]{40})$/.exec(uri);
+    const result = /^github.com\/([^\/]+\/([^\/]+))\/([0-9a-f]{40}).*$/.exec(uri);
     if (result == null) {
         throw new Error("Error parsing github URI " + uri);
     }
@@ -95,7 +96,7 @@ function getPackage(lockfile, packageDesc, remove) {
     }
     let dep;
     dep = { version: packageDesc.version };
-    if (packageDesc.type === PnpmPackageDescType.Github && snapshot.name !== undefined) {
+    if (packageDesc.type === PnpmPackageDescType.Github && snapshot.name !== undefined && lockfile.specifiers !== undefined) {
         if (lockfile.specifiers[snapshot.name] !== undefined) {
             dep.from = lockfile.specifiers[snapshot.name];
         }
