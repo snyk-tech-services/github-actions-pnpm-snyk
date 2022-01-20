@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.processPnpmLockfile = void 0;
 const types_1 = require("@pnpm/types");
 const read_yaml_file_1 = __importDefault(require("read-yaml-file"));
 var PnpmPackageDescType;
@@ -32,7 +33,7 @@ async function readPnpmLockfile(lockfilePath) {
     }
 }
 function getGithubPackageDesc(uri) {
-    const result = /^github.com\/([^\/]+\/([^\/]+))\/([0-9a-f]{40})$/.exec(uri);
+    const result = /^github\.com\/([^\/]+\/([^\/]+))\/([0-9a-f]{40}).*$/.exec(uri);
     if (result == null) {
         throw new Error("Error parsing github URI " + uri);
     }
@@ -48,6 +49,7 @@ function getGithubPackageDesc(uri) {
 //   npm.example.com/axios/0.19.0
 //   npm.example.com/@sentry/node/5.1.0_@other@1.2.3
 //   github.com/LewisArdern/eslint-plugin-angularjs-security-rules/41da01727c87119bd523e69e22af2d04ab558ec9
+//   github.com/Vydia/eslint-plugin-babel/0a1f35536c8182892459f192284f022cdee95561_eslint@7.19.0
 function getPathPackageDesc(fullname) {
     if (!fullname.startsWith('github.com/')) {
         const result = /^[^\/]*\/((?:@[^\/]+\/)?[^\/]+)\/(.*)$/.exec(fullname);
