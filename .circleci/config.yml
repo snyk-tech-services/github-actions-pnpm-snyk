@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-    snyk: snyk/snyk@0.0.8
+    snyk: snyk/snyk@1.1.2
 jobs:
     build-test-monitor:
         docker:
@@ -10,9 +10,9 @@ jobs:
             - run: npm install
             - run: npm test
             - snyk/scan:
-                fail-on-issues: true
-                monitor-on-build: true
-                token-variable: SNYK_TOKEN
+                  fail-on-issues: true
+                  monitor-on-build: true
+                  token-variable: SNYK_TOKEN
             - run: npx tsc
     build-test:
         docker:
@@ -22,34 +22,33 @@ jobs:
             - run: npm install
             - run: npm test
             - snyk/scan:
-                fail-on-issues: true
-                monitor-on-build: false
-                token-variable: SNYK_TOKEN
+                  fail-on-issues: true
+                  monitor-on-build: false
+                  token-variable: SNYK_TOKEN
             - run: npx tsc
 
 workflows:
-    version: 2.1
     nightly:
         triggers:
-          - schedule:
-              cron: "0 0 * * *"
-              filters:
-                branches:
-                  only:
-                    - master
+            - schedule:
+                  cron: "0 0 * * *"
+                  filters:
+                      branches:
+                          only:
+                              - master
         jobs:
             - build-test-monitor
     build-test-monitor:
         jobs:
             - build-test-monitor:
-                filters:
-                    branches:
-                        only:
-                            - master
+                  filters:
+                      branches:
+                          only:
+                              - master
     build-test:
         jobs:
             - build-test:
-                filters:
-                    branches:
-                        ignore:
-                            - master
+                  filters:
+                      branches:
+                          ignore:
+                              - master
