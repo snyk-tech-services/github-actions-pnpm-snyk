@@ -32,7 +32,7 @@ async function readPnpmLockfile(lockfilePath) {
     }
 }
 function getGithubPackageDesc(uri) {
-    const result = /^github.com\/([^\/]+\/([^\/]+))\/([0-9a-f]{40})$/.exec(uri);
+    const result = /^github.com\/([^\/]+\/([^\/]+))\/([0-9a-f]{40}).*$/.exec(uri);
     if (result == null) {
         throw new Error("Error parsing github URI " + uri);
     }
@@ -95,7 +95,7 @@ function getPackage(lockfile, packageDesc, remove) {
     }
     let dep;
     dep = { version: packageDesc.version };
-    if (packageDesc.type === PnpmPackageDescType.Github && snapshot.name !== undefined) {
+    if (packageDesc.type === PnpmPackageDescType.Github && snapshot.name !== undefined && lockfile.specifiers !== undefined) {
         if (lockfile.specifiers[snapshot.name] !== undefined) {
             dep.from = lockfile.specifiers[snapshot.name];
         }
