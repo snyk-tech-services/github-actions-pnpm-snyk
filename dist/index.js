@@ -87454,7 +87454,8 @@ function getPackage(lockfile, packageDesc, remove) {
     }
     const dep = { version: packageDesc.version };
     if (packageDesc.type === PnpmPackageDescType.Github &&
-        snapshot.name !== undefined) {
+        snapshot.name !== undefined &&
+        lockfile.specifiers !== undefined) {
         if (lockfile.specifiers[snapshot.name] !== undefined) {
             dep.from = lockfile.specifiers[snapshot.name];
         }

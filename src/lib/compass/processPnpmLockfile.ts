@@ -164,7 +164,8 @@ function getPackage(
 
   if (
     packageDesc.type === PnpmPackageDescType.Github &&
-    snapshot.name !== undefined
+    snapshot.name !== undefined &&
+    lockfile.specifiers !== undefined
   ) {
     if (lockfile.specifiers[snapshot.name] !== undefined) {
       dep.from = lockfile.specifiers[snapshot.name];
