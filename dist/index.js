@@ -87385,7 +87385,7 @@ async function readPnpmLockfile(lockfilePath) {
     }
 }
 function getGithubPackageDesc(uri) {
-    const result = /^github\.com\/([^/]+\/([^/]+))\/([0-9a-f]{40}).*$/.exec(uri);
+    const result = /^github\.com\/([^/]+\/([^/]+))\/([0-9a-f]{40})$/.exec(uri);
     if (result == null) {
         throw new Error("Error parsing github URI " + uri);
     }
