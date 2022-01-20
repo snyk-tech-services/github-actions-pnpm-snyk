@@ -1,42 +1,42 @@
-name: 'Snyk Pnpm Github Actions'
-description: 'Snyk test and PR check Pnpm projects'
+name: "Snyk Pnpm Github Actions"
+description: "Snyk test and PR check Pnpm projects"
 inputs:
   snykToken:
-    description: 'Snyk token'
+    description: "Snyk token"
     required: true
-    default: ''
+    default: ""
   snykOrganization:
-    description: 'Snyk organization'
+    description: "Snyk organization"
     required: true
-    default: ''
+    default: ""
   breakBuild:
-    description: 'Boolean flag to break build if new issue(s) - default true'
+    description: "Boolean flag to break build if new issue(s) - default true"
     required: false
-    default: true
+    default: "true"
   showDepsInfo:
-    description: 'Enable dependency change details'
+    description: "Enable dependency change details"
     required: false
-    default: false
+    default: "false"
   pnpmLockfilePath:
-    description: 'Path to pnpm lock file'
+    description: "Path to pnpm lock file"
     required: false
-    default: '.'
+    default: "."
   debug:
-    description: 'Enable debug mode - boolean'
+    description: "Enable debug mode - boolean"
     required: false
-    default: false
+    default: "false"
   snykArguments:
-    description: 'Series of argument you would pass Snyk test'
+    description: "Series of argument you would pass Snyk test"
     required: false
-    default: ''
+    default: ""
   fullScan:
-    description: 'Enable to break if contains any issues, not just newly introduced issues'
+    description: "Enable to break if contains any issues, not just newly introduced issues"
     required: false
-    default: false
+    default: "false"
   branchPattern:
-    description: 'Branch pattern for which this logic should kick in'
+    description: "Branch pattern for which this logic should kick in"
     required: false
-    default: ''
+    default: ""
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "dist/index.js"
